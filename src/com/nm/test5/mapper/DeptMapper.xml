@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nm.test5.mapper.DeptMapper" >
+    <select id="selAll" resultType="com.nm.test5.pojo.Department">
+      select *from depart_info
+      <where>
+          <if test="dep_name!=null">
+              and dep_name like concat('%',#{dep_name},'%')
+          </if>
+
+
+      </where>
+    </select>
+
+    <select id="selByDep_id" resultType="com.nm.test5.pojo.Department">
+        select *from depart_info where dep_id=#{dep_id}
+    </select>
+
+
+    <insert id="insert" parameterType="com.nm.test5.pojo.Department">
+        insert into depart_info(dep_id,dep_name,dep_desc,dep_state)values(default ,#{dep_name},#{dep_desc},0)
+    </insert>
+
+    <update id="update" parameterType="com.nm.test5.pojo.Department">
+        update depart_info set dep_name=#{dep_name},dep_desc=#{dep_desc} where dep_id=#{dep_id}
+    </update>
+
+
+    <update id="deletes" parameterType="com.nm.test5.pojo.Department">
+        update depart_info set dep_state=1 where dep_id in
+        <foreach item="dep_id" collection="ids" open="(" separator="," close=")">
+        #{dep_id}
+    </foreach>
+    </update>
+</mapper>

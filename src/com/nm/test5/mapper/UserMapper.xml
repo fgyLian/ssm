@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nm.test5.mapper.UserMapper" >
+    <resultMap id="WithDeptResultMap" type="com.nm.test5.pojo.Users" >
+        <id column="USER_ID" property="user_id" jdbcType="INTEGER" />
+        <result column="DEP_ID" property="dep_id" jdbcType="INTEGER" />
+        <result column="USER_NAME" property="user_name" jdbcType="VARCHAR" />
+        <result column="USER_SEX" property="user_sex" jdbcType="VARCHAR" />
+        <result column="USER_STATE" property="user_state" jdbcType="INTEGER" />
+        <association property="department" javaType="com.nm.test5.pojo.Department">
+            <id column="DEP_ID" property="dep_id" jdbcType="INTEGER" />
+            <result column="DEP_NAME" property="dep_name" jdbcType="VARCHAR" />
+            <result column="DEP_STATE" property="dep_state" jdbcType="INTEGER" />
+            <result column="DEP_DESC" property="dep_desc" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+
+    <select id="selAll" resultMap="WithDeptResultMap">
+        select * from user_info u INNER JOIN depart_info d ON u.DEP_ID=d.DEP_ID
+        <where>
+            <if test="user_name!=null">
+                and user_name like concat('%',#{user_name},'%')
+            </if>
+            <if test="dep_id!=null">
+                and d.dep_id=#{dep_id}
+            </if>
+
+        </where>
+    </select>
+
+    <select id="selByUser_id" resultType="com.nm.test5.pojo.Users">
+        select *from user_info where user_id=#{user_id}
+    </select>
+
+    <select id="selUserByDep_id" resultMap="WithDeptResultMap">
+        select *from user_info u INNER JOIN depart_info d ON u.DEP_ID=d.DEP_ID where u.dep_id=#{dep_id}
+    </select>
+
+    <insert id="insert" parameterType="com.nm.test5.pojo.Users">
+        insert into user_info(user_id,dep_id,user_name,user_sex,user_state)values(default ,#{dep_id},#{user_name},#{user_sex},0)
+    </insert>
+
+    <update id="update" parameterType="com.nm.test5.pojo.Users">
+        update user_info set dep_id=#{dep_id},user_name=#{user_name},user_sex=#{user_sex} where user_id=#{user_id}
+    </update>
+
+    <!--假删除-->
+    <update id="deletes" parameterType="com.nm.test5.pojo.Users">
+        update user_info set user_state=1 where user_id in
+        <foreach item="user_id" collection="ids" open="(" separator="," close=")">
+        #{user_id}
+    </foreach>
+    </update>
+</mapper>
